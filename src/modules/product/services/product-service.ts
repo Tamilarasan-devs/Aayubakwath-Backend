@@ -53,12 +53,12 @@ export class ProductService {
     }
 
     // Handle data parsing for FormData inputs
-    let productTags = input.productTags;
+    let productTags: any = input.productTags;
     if (typeof productTags === 'string') {
       productTags = productTags.split(',').map((t: string) => t.trim()).filter(Boolean);
     }
 
-    let offerTags = input.offerTags;
+    let offerTags: any = input.offerTags;
     if (typeof offerTags === 'string') {
       offerTags = offerTags.split(',').map((t: string) => t.trim()).filter(Boolean);
     }
@@ -141,12 +141,12 @@ export class ProductService {
       }
     }
 
-    let productTags = input.productTags;
+    let productTags: any = input.productTags;
     if (typeof productTags === 'string') {
       productTags = productTags.split(',').map((t: string) => t.trim()).filter(Boolean);
     }
 
-    let offerTags = input.offerTags;
+    let offerTags: any = input.offerTags;
     if (typeof offerTags === 'string') {
       offerTags = offerTags.split(',').map((t: string) => t.trim()).filter(Boolean);
     }

@@ -43,7 +43,7 @@ const deleteBannerHandler = (service: any, name: string) =>
   });
 
 const deleteAllBannersHandler = (service: any, name: string) =>
-  asyncHandler(async (req: Request, res: Response) => {
+  asyncHandler(async (_req: Request, res: Response) => {
     await service.deleteAll();
     successResponse(res, null, `All ${name}s deleted successfully`);
   });

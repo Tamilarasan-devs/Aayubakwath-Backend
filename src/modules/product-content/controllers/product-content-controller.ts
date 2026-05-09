@@ -8,7 +8,7 @@ export const createProductContent = asyncHandler(async (req: Request, res: Respo
   successResponse(res, content, 'Product content created successfully', 201);
 });
 
-export const getAllProductContents = asyncHandler(async (req: Request, res: Response) => {
+export const getAllProductContents = asyncHandler(async (_req: Request, res: Response) => {
   const contents = await productContentService.findAll();
   successResponse(res, contents, 'Product contents retrieved successfully');
 });
