@@ -1,7 +1,13 @@
 import dotenv from 'dotenv';
 import { z } from 'zod';
 
-dotenv.config();
+const result = dotenv.config({ override: true });
+if (result.error) {
+  console.error('Error loading .env file:', result.error);
+} else {
+  console.log(`Loaded ${Object.keys(result.parsed || {}).length} environment variables from .env`);
+}
+
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
