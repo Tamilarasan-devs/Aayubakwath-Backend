@@ -2,11 +2,18 @@ import dotenv from 'dotenv';
 import { z } from 'zod';
 
 const result = dotenv.config({ override: true });
-if (result.error) {
+
+// In production (like Railway), .env files usually don't exist as variables are injected directly.
+// We only log errors that aren't "File Not Found".
+if (result.error && (result.error as any).code !== 'ENOENT') {
   console.error('Error loading .env file:', result.error);
-} else {
-  console.log(`Loaded ${Object.keys(result.parsed || {}).length} environment variables from .env`);
+} else if (!result.error) {
+  // Only log success in development to keep production logs clean
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`Loaded ${Object.keys(result.parsed || {}).length} environment variables from .env`);
+  }
 }
+
 
 
 const envSchema = z.object({
