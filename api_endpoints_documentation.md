@@ -3,7 +3,7 @@
 This document lists all backend API endpoints for the Aayubakwath 2.0 platform. All routes are prefixed with `/api/v1`.
 
 ## Base URL
-- Production: `https://aayubakwath-backend-production.up.railway.app/api/v1`
+- Production: `https://aayubakwath-backend-production-2e7f.up.railway.app/api/v1`
 - Local: `http://localhost:5001/api/v1`
 
 ---
