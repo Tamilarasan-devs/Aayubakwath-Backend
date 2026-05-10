@@ -61,7 +61,7 @@ export const createApp = () => {
     });
   });
 
-  app.get('/ping', (req, res) => res.json({ pong: true }));
+  app.get('/ping', (_req, res) => res.json({ pong: true }));
 
   app.use('/api/v1', v1Routes);
 

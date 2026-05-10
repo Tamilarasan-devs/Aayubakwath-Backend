@@ -18,10 +18,6 @@ import userRoutes from '@modules/user/routes/user-routes.js';
 import wishlistRoutes from '@modules/wishlist/routes/wishlist-routes.js';
 import uploadRoutes from '@modules/upload/routes/upload-routes.js';
 
-import { updateProfile } from '@modules/auth/controllers/auth-controller.js';
-import { updateProfileSchema } from '@modules/auth/validators/auth-validator.js';
-import { authenticate } from '@middleware/auth.js';
-import { validate } from '@middleware/validate.js';
 
 const router = Router();
 

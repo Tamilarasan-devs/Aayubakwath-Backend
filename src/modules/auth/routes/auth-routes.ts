@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { register, login, refreshToken, getProfile, verifyOtp, resendOtp, updateProfile } from '@modules/auth/controllers/auth-controller.js';
+import { register, login, refreshToken, getProfile, verifyOtp, resendOtp } from '@modules/auth/controllers/auth-controller.js';
 import { validate } from '@middleware/validate.js';
 import { authenticate } from '@middleware/auth.js';
 import { authRateLimiter } from '@middleware/rate-limiter.js';
-import { registerSchema, loginSchema, refreshTokenSchema, verifyOtpSchema, resendOtpSchema, updateProfileSchema } from '@modules/auth/validators/auth-validator.js';
+import { registerSchema, loginSchema, refreshTokenSchema, verifyOtpSchema, resendOtpSchema } from '@modules/auth/validators/auth-validator.js';
 
 const router = Router();
 console.log('Auth routes loading...');
