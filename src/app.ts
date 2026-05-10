@@ -61,13 +61,11 @@ export const createApp = () => {
     });
   });
 
-  app.get('/ready', (_req, res) => {
-    res.json({ success: true, message: 'Server is ready' });
-  });
+  app.get('/ping', (req, res) => res.json({ pong: true }));
 
   app.use('/api/v1', v1Routes);
 
-  app.all('{*path}', notFoundHandler);
+  app.use(notFoundHandler);
 
   app.use(errorHandler);
 

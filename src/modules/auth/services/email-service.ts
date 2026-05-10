@@ -6,16 +6,28 @@ const FROM = process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev';
 let resend: Resend | null = null;
 
 const getResendClient = () => {
-  if (!process.env.RESEND_API_KEY) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    if (process.env.NODE_ENV === 'development') {
+      logger.warn('RESEND_API_KEY is missing. Email will be logged to console instead.');
+      return null;
+    }
     throw new Error('RESEND_API_KEY is required to send verification emails');
   }
 
-  resend ??= new Resend(process.env.RESEND_API_KEY);
+  resend ??= new Resend(apiKey);
   return resend;
 };
 
 export async function sendOtpEmail(to: string, otp: string): Promise<void> {
-  const { error } = await getResendClient().emails.send({
+  const client = getResendClient();
+
+  if (!client) {
+    logger.info(`[DEV MODE] OTP for ${to}: ${otp}`);
+    return;
+  }
+
+  const { error } = await client.emails.send({
     from: FROM,
     to,
     subject: 'Your verification code',

@@ -39,3 +39,8 @@ export const verifyOtpSchema = z.object({
 export const resendOtpSchema = z.object({
   userId: z.string().uuid(),
 });
+
+export const updateProfileSchema = z.object({
+  name: z.string().min(2).max(100).optional(),
+  phoneNumber: z.string().min(10).max(15).optional().or(z.literal('')),
+});

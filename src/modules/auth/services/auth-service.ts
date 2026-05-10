@@ -172,7 +172,7 @@ export class AuthService {
       throw AppError.forbidden('Account is deactivated');
     }
 
-    if (user.email && !user.isEmailVerified) {
+    if (user.email && !user.isEmailVerified && process.env.NODE_ENV === 'production') {
       throw AppError.forbidden('Please verify your email before logging in');
     }
 

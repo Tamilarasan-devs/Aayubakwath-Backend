@@ -39,3 +39,26 @@ export const getProfile = asyncHandler(async (req: AuthenticatedRequest, res: Re
   });
   successResponse(res, { id, name, email, phoneNumber, role, createdAt, addresses }, 'Profile retrieved successfully');
 });
+
+export const updateProfile = asyncHandler(async (req: AuthenticatedRequest, res: Response, _next: NextFunction) => {
+  const { id } = req.user!;
+  const { name, phoneNumber } = req.body;
+
+  const updatedUser = await prisma.user.update({
+    where: { id },
+    data: {
+      name,
+      phoneNumber,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phoneNumber: true,
+      role: true,
+      createdAt: true,
+    },
+  });
+
+  successResponse(res, updatedUser, 'Profile updated successfully');
+});

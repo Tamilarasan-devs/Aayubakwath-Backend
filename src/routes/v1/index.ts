@@ -18,8 +18,14 @@ import userRoutes from '@modules/user/routes/user-routes.js';
 import wishlistRoutes from '@modules/wishlist/routes/wishlist-routes.js';
 import uploadRoutes from '@modules/upload/routes/upload-routes.js';
 
+import { updateProfile } from '@modules/auth/controllers/auth-controller.js';
+import { updateProfileSchema } from '@modules/auth/validators/auth-validator.js';
+import { authenticate } from '@middleware/auth.js';
+import { validate } from '@middleware/validate.js';
+
 const router = Router();
 
+console.log('Mounting /auth routes...');
 router.use('/auth', authRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/products', productRoutes);
@@ -33,7 +39,9 @@ router.use('/offer-banners', offerBannerRoutes);
 router.use('/category-banners', categoryBannerRoutes);
 router.use('/offer-bars', offerBarRoutes);
 router.use('/product-contents', productContentRoutes);
+console.log('Mounting /users routes...');
 router.use('/users', userRoutes);
+console.log('/users routes mounted.');
 router.use('/analytics', analyticsRoutes);
 router.use('/reviews', reviewRoutes);
 router.use('/inquiries', inquiryRoutes);
