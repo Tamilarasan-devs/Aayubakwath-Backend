@@ -17,6 +17,8 @@ import reviewRoutes from '@modules/review/routes/review-routes.js';
 import userRoutes from '@modules/user/routes/user-routes.js';
 import wishlistRoutes from '@modules/wishlist/routes/wishlist-routes.js';
 import uploadRoutes from '@modules/upload/routes/upload-routes.js';
+import newsletterRoutes from '@modules/newsletter/routes/newsletter-routes.js';
+
 
 
 const router = Router();
@@ -42,5 +44,7 @@ router.use('/analytics', analyticsRoutes);
 router.use('/reviews', reviewRoutes);
 router.use('/inquiries', inquiryRoutes);
 router.use('/coupons', couponRoutes);
+router.use('/newsletter', newsletterRoutes);
+
 
 export default router;

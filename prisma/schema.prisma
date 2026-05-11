@@ -329,6 +329,18 @@ model CouponUsage {
   @@map("coupon_usages")
 }
 
+model NewsletterSubscriber {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([createdAt])
+  @@map("newsletter_subscribers")
+}
+
 enum Role {
   USER
   ADMIN
