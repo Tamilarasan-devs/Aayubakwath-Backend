@@ -27,8 +27,12 @@ export const getSubscribers = asyncHandler(async (req: Request, res: Response) =
   });
 });
 
+
+
 export const deleteSubscriber = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
+
   await newsletterService.deleteSubscriber(id);
+
   successResponse(res, null, 'Subscriber deleted successfully');
 });
