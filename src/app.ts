@@ -35,7 +35,8 @@ export const createApp = () => {
 
   app.use(
   helmet({
-    crossOriginEmbedderPolicy: false, // 🔥 THIS fixes your Cloudinary issue
+    crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false,
     crossOriginResourcePolicy: { policy: "cross-origin" },
   })
 );
