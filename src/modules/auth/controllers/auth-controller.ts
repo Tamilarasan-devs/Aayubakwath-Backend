@@ -62,3 +62,20 @@ export const updateProfile = asyncHandler(async (req: AuthenticatedRequest, res:
 
   successResponse(res, updatedUser, 'Profile updated successfully');
 });
+
+export const forgotPassword = asyncHandler(async (req: ExpressRequest, res: Response, _next: NextFunction) => {
+  const result = await authService.forgotPassword(req.body.email);
+  successResponse(res, result, 'Reset code sent to your email');
+});
+
+export const resetPassword = asyncHandler(async (req: ExpressRequest, res: Response, _next: NextFunction) => {
+  const { userId, otp, password } = req.body;
+  await authService.resetPassword(userId, otp, password);
+  successResponse(res, null, 'Password reset successful');
+});
+
+export const verifyResetOtp = asyncHandler(async (req: ExpressRequest, res: Response, _next: NextFunction) => {
+  const { userId, otp } = req.body;
+  await authService.verifyResetOtp(userId, otp);
+  successResponse(res, null, 'OTP verified successfully');
+});

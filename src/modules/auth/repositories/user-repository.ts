@@ -51,6 +51,13 @@ export class UserRepository extends BaseRepository<User> {
       data: { isEmailVerified: true, otpCode: null, otpExpiry: null },
     });
   }
+
+  async updatePassword(userId: string, password: string): Promise<void> {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password, otpCode: null, otpExpiry: null },
+    });
+  }
 }
 
 export const userRepository = new UserRepository();

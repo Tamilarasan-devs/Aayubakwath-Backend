@@ -208,6 +208,79 @@ export class AuthService {
       refreshToken: generateRefreshToken(newTokenPayload),
     };
   }
+  async forgotPassword(email: string): Promise<{ userId: string; email: string }> {
+    const user = await userRepository.findByEmail(email);
+    if (!user) {
+      // Don't reveal if user exists or not for security, but in this specific app context 
+      // the user wants to know if they can reset it.
+      // However, usually we return success anyway. 
+      // Let's check if we want to be helpful or secure.
+      // If user not found, we throw 404 since it's an e-commerce app and helpfulness is better.
+      throw AppError.notFound('No account found with this email address');
+    }
+
+    const otp = generateOtp();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+    const hashedOtp = await hashPassword(otp);
+    await userRepository.saveOtp(user.id, hashedOtp, otpExpiry);
+
+    const { sendForgotPasswordEmail } = await import('./email-service.js');
+    await sendForgotPasswordEmail(email, otp);
+
+    logger.info(`Forgot password OTP sent to: ${user.id}`);
+
+    return {
+      userId: user.id,
+      email: user.email ?? '',
+    };
+  }
+
+  async resetPassword(userId: string, otp: string, password: string): Promise<void> {
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      throw AppError.notFound('User not found');
+    }
+
+    if (!user.otpCode || !user.otpExpiry) {
+      throw AppError.badRequest('No reset request found. Please try again.');
+    }
+
+    if (new Date() > user.otpExpiry) {
+      throw AppError.badRequest('Reset code has expired. Please request a new one.');
+    }
+
+    const isValid = await comparePassword(otp, user.otpCode);
+    if (!isValid) {
+      throw AppError.badRequest('Invalid reset code');
+    }
+
+    validatePasswordStrength(password);
+    const hashedPassword = await hashPassword(password);
+
+    await userRepository.updatePassword(user.id, hashedPassword);
+    
+    logger.info(`Password reset successful for user: ${user.id}`);
+  }
+
+  async verifyResetOtp(userId: string, otp: string): Promise<void> {
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      throw AppError.notFound('User not found');
+    }
+
+    if (!user.otpCode || !user.otpExpiry) {
+      throw AppError.badRequest('No reset request found');
+    }
+
+    if (new Date() > user.otpExpiry) {
+      throw AppError.badRequest('Reset code has expired');
+    }
+
+    const isValid = await comparePassword(otp, user.otpCode);
+    if (!isValid) {
+      throw AppError.badRequest('Invalid reset code');
+    }
+  }
 }
 
 export const authService = new AuthService();

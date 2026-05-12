@@ -44,3 +44,13 @@ export const updateProfileSchema = z.object({
   name: z.string().min(2).max(100).optional(),
   phoneNumber: z.string().min(10).max(15).optional().or(z.literal('')),
 });
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+export const resetPasswordSchema = z.object({
+  userId: z.string().uuid(),
+  otp: z.string().length(6).regex(/^\d{6}$/, 'OTP must be 6 digits'),
+  password: z.string().min(8).max(128),
+});
