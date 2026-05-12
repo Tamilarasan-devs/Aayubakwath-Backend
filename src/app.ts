@@ -33,9 +33,12 @@ export const createApp = () => {
     })
   );
 
-  app.use(helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" }
-  }));
+  app.use(
+  helmet({
+    crossOriginEmbedderPolicy: false, // 🔥 THIS fixes your Cloudinary issue
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
 
   app.use(compression());
 
