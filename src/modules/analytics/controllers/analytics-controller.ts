@@ -1,3 +1,4 @@
+// Reloading to refresh database connection
 import { Response } from 'express';
 import type { AuthenticatedRequest } from '@/types/index.js';
 import { prisma } from '@config/database.js';

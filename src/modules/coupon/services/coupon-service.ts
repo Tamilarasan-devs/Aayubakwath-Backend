@@ -73,6 +73,10 @@ export class CouponService {
     return couponRepository.delete(id);
   }
 
+  async getPublicCoupons() {
+    return couponRepository.findAllActive();
+  }
+
   private async evaluateCoupon(userId: string, code: string): Promise<CouponApplyResult> {
     const coupon = await couponRepository.findByCode(code);
     if (!coupon || !coupon.isActive) throw AppError.badRequest('Invalid or inactive coupon');

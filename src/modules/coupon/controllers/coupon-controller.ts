@@ -39,3 +39,8 @@ export const applyCoupon = asyncHandler(async (req: AuthenticatedRequest, res: R
   successResponse(res, result, 'Coupon applied successfully');
 });
 
+export const getPublicCoupons = asyncHandler(async (_req: Request, res: Response) => {
+  const coupons = await couponService.getPublicCoupons();
+  successResponse(res, coupons, 'Public coupons retrieved successfully');
+});
+

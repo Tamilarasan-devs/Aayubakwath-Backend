@@ -6,6 +6,7 @@ import {
   updateCoupon,
   deleteCoupon,
   applyCoupon,
+  getPublicCoupons,
 } from '@modules/coupon/controllers/coupon-controller.js';
 import { authenticate, authorize } from '@middleware/auth.js';
 import { validate } from '@middleware/validate.js';
@@ -13,6 +14,9 @@ import { idParamSchema, paginationSchema } from '@modules/product/validators/pro
 import { createCouponSchema, updateCouponSchema, applyCouponSchema } from '@modules/coupon/validators/coupon-validator.js';
 
 const router = Router();
+
+// Public — no auth needed (used by offer popup & profile coupons page)
+router.get('/public', getPublicCoupons);
 
 router.post('/apply', authenticate, validate(applyCouponSchema), applyCoupon);
 
