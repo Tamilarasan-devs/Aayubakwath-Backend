@@ -19,32 +19,39 @@ export class CouponRepository extends BaseRepository<any> {
   }
 
   async findAllActive() {
-    const now = new Date();
-    return (prisma as any).coupon.findMany({
-      where: {
-        isActive: true,
-        OR: [
-          { expiresAt: null },
-          { expiresAt: { gt: now } },
-        ],
-        OR: [
-          { startsAt: null },
-          { startsAt: { lte: now } },
-        ],
-      },
-      select: {
-        id: true,
-        code: true,
-        description: true,
-        discountType: true,
-        discountValue: true,
-        minOrderAmount: true,
-        maxDiscountAmount: true,
-        expiresAt: true,
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-  }
+  const now = new Date();
+
+  return (prisma as any).coupon.findMany({
+    where: {
+      isActive: true,
+      AND: [
+        {
+          OR: [
+            { expiresAt: null },
+            { expiresAt: { gt: now } },
+          ],
+        },
+        {
+          OR: [
+            { startsAt: null },
+            { startsAt: { lte: now } },
+          ],
+        },
+      ],
+    },
+    select: {
+      id: true,
+      code: true,
+      description: true,
+      discountType: true,
+      discountValue: true,
+      minOrderAmount: true,
+      maxDiscountAmount: true,
+      expiresAt: true,
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+}
 }
 
 export const couponRepository = new CouponRepository();
