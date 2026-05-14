@@ -12,10 +12,12 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ): void => {
-  let error = err;
+  let error = err as any;
 
   if (!(error instanceof AppError)) {
-    error = AppError.internal('An unexpected error occurred');
+    // Wrap it but keep the original message to help debugging
+    const originalMessage = err.message || 'An unexpected error occurred';
+    error = AppError.internal(originalMessage);
     logger.error('Unhandled error:', err);
   }
 
@@ -29,6 +31,10 @@ export const errorHandler = (
 
   if (err instanceof Prisma.PrismaClientValidationError) {
     error = AppError.badRequest('Invalid request data');
+  }
+
+  if (err instanceof Prisma.PrismaClientInitializationError) {
+    error = AppError.internal('Database connection failed. Please ensure the database server is running.');
   }
 
   if (err instanceof ZodError) {

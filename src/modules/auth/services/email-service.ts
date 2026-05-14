@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { logger } from '@config/logger.js';
+import { AppError } from '@utils/app-error.js';
 
 // Use the SMTP user as the default sender address
 const FROM = process.env.SMTP_USER ?? 'tamilarasan.softwarengineer@gmail.com';
@@ -17,7 +18,7 @@ const createTransporter = () => {
       logger.warn('SMTP configuration is incomplete. Email will be logged to console instead.');
       return null;
     }
-    throw new Error('SMTP configuration (HOST, USER, PASS) is required for production email sending');
+    throw AppError.internal('SMTP configuration (HOST, USER, PASS) is required for production email sending');
   }
 
   return nodemailer.createTransport({
@@ -60,7 +61,7 @@ export async function sendOtpEmail(to: string, otp: string): Promise<void> {
       command: error.command,
       response: error.response
     });
-    throw new Error('Failed to send verification email');
+    throw AppError.internal('Failed to send verification email');
   }
 }
 
@@ -96,6 +97,6 @@ export async function sendForgotPasswordEmail(to: string, otp: string): Promise<
       command: error.command,
       response: error.response
     });
-    throw new Error('Failed to send password reset email');
+    throw AppError.internal('Failed to send password reset email');
   }
 }
