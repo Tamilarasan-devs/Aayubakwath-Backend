@@ -65,6 +65,7 @@ export class AuthService {
         userId: existingUser.id,
         email: existingUser.email ?? '',
         message: 'Verification code sent to your email',
+        ...(process.env.NODE_ENV === 'development' && { otp }),
       };
     }
 
@@ -90,6 +91,7 @@ export class AuthService {
       userId: user.id,
       email: user.email ?? '',
       message: 'Verification code sent to your email',
+      ...(process.env.NODE_ENV === 'development' && { otp }),
     };
   }
 
@@ -232,6 +234,7 @@ export class AuthService {
     return {
       userId: user.id,
       email: user.email ?? '',
+      ...(process.env.NODE_ENV === 'development' && { otp }),
     };
   }
 
