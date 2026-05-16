@@ -33,6 +33,9 @@ const createTransporter = () => {
       maxConnections: 5,
       maxMessages: 100,
 
+      // Force IPv4 as many cloud environments (like Railway) have issues with IPv6
+      family: 4,
+
       auth: {
         user,
         pass,
