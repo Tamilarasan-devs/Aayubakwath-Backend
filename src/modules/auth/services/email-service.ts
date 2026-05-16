@@ -27,6 +27,9 @@ const createTransporter = () => {
       host,
       port,
       secure: port === 465,
+      pool: true, // Use pooling for better performance and resilience
+      maxConnections: 5,
+      maxMessages: 100,
 
       auth: {
         user,
@@ -37,10 +40,10 @@ const createTransporter = () => {
         rejectUnauthorized: false,
       },
 
-      // Timeouts
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 15000,
+      // Increased timeouts to handle slow SMTP responses
+      connectionTimeout: 20000, // 20s
+      greetingTimeout: 20000,   // 20s
+      socketTimeout: 30000,     // 30s
     } as any
   );
 };
@@ -137,7 +140,16 @@ const sendEmail = async (
       message: error?.message,
       code: error?.code,
       response: error?.response,
+      command: error?.command,
+      stack: error?.stack,
+      to,
+      subject
     });
+
+    // Provide a more descriptive error if it's a timeout
+    if (error?.code === 'ETIMEDOUT' || error?.message?.includes('timeout')) {
+      throw AppError.internal('Email service connection timed out. Please try again.');
+    }
 
     throw AppError.internal('Failed to send email');
   }
