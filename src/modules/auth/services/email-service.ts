@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { logger } from '@config/logger.js';
 import { AppError } from '@utils/app-error.js';
 
@@ -8,13 +9,14 @@ const FROM =
   process.env.SMTP_USER ||
   'no-reply@example.com';
 
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
 const createTransporter = () => {
   const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 587);
+  const port = Number(process.env.SMTP_PORT || 465); // Default to 465 for better compatibility
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
 
-  // Prevent crashes if SMTP config is missing
   if (!host || !user || !pass) {
     logger.warn(
       'SMTP configuration is incomplete. Emails will be logged to console.'
@@ -26,8 +28,8 @@ const createTransporter = () => {
     {
       host,
       port,
-      secure: port === 465,
-      pool: true, // Use pooling for better performance and resilience
+      secure: port === 465, // Use true for 465, false for other ports
+      pool: true,
       maxConnections: 5,
       maxMessages: 100,
 
@@ -37,6 +39,7 @@ const createTransporter = () => {
       },
 
       tls: {
+        // Do not fail on invalid certs
         rejectUnauthorized: false,
       },
 
@@ -118,15 +121,42 @@ const sendEmail = async (
   subject: string,
   html: string
 ): Promise<void> => {
-  const transporter = createTransporter();
-
-  // Development fallback
-  if (!transporter) {
-    logger.info(`[DEV EMAIL] To: ${to} | Subject: ${subject}`);
-    return;
-  }
-
+  let stage = 'initializing';
   try {
+    // Try Resend first if API key is provided
+    if (resend) {
+      stage = 'sending via Resend';
+      try {
+        const { data, error } = await resend.emails.send({
+          from: `Aayubakwath <${process.env.RESEND_FROM_EMAIL || FROM}>`,
+          to,
+          subject,
+          html,
+        });
+
+        if (error) {
+          logger.error('Resend email failed', { error });
+          // Fall back to nodemailer if Resend fails
+        } else {
+          logger.info(`Email sent successfully via Resend to ${to}`, { id: data?.id });
+          return;
+        }
+      } catch (resendError: any) {
+        logger.error('Resend service error', { message: resendError?.message, stage });
+        // Fall back to nodemailer
+      }
+    }
+
+    stage = 'creating transporter';
+    const transporter = createTransporter();
+
+    // Development fallback
+    if (!transporter) {
+      logger.info(`[DEV EMAIL] To: ${to} | Subject: ${subject}`);
+      return;
+    }
+
+    stage = 'sending via SMTP';
     await transporter.sendMail({
       from: `"Aayubakwath" <${FROM}>`,
       to,
@@ -137,6 +167,7 @@ const sendEmail = async (
     logger.info(`Email sent successfully to ${to}`);
   } catch (error: any) {
     logger.error('Email sending failed', {
+      stage,
       message: error?.message,
       code: error?.code,
       response: error?.response,
@@ -146,12 +177,18 @@ const sendEmail = async (
       subject
     });
 
-    // Provide a more descriptive error if it's a timeout
+    // Provide a more descriptive error based on the stage and error type
+    const errorPrefix = `Email failed during ${stage}: `;
+    
     if (error?.code === 'ETIMEDOUT' || error?.message?.includes('timeout')) {
-      throw AppError.internal('Email service connection timed out. Please try again.');
+      throw AppError.internal(`${errorPrefix}Connection timed out. Please check your SMTP settings or network.`);
     }
 
-    throw AppError.internal('Failed to send email');
+    if (error?.code === 'EAUTH' || error?.message?.includes('Invalid login')) {
+      throw AppError.internal(`${errorPrefix}Authentication failed. Please check your SMTP credentials.`);
+    }
+
+    throw AppError.internal(`${errorPrefix}${error?.message || 'Unexpected error'}`);
   }
 };
 
